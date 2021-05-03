@@ -1,0 +1,154 @@
+<html>
+    
+    <style>
+        .topright {
+          position: absolute;
+          top: 8px;
+          right: 16px;
+          font-size: 18px;
+        }
+        .button {
+        background-color:#5BC125;
+        border-radius:3px;
+        
+        display:inline-block;
+        cursor:pointer;
+        color:#ffffff;
+        font-family:Arial;
+        font-size:15px;
+        padding:9px 23px;
+        text-decoration:none;
+      }
+      .button:hover {
+        background-color: #4CB911;
+      }
+      .button:active {
+        position:relative;
+        top:1px;
+      }
+      h3, a, button, p {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .user, .pass  {
+            height:30px;
+            font-size:14pt;
+            border: none; /* <-- This thing here */
+            border:solid 1px #ccc;
+            border-radius: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .butt {
+    background-color: #5BC125;
+    border: none; /* <-- This thing here */
+    border-radius: 10px;
+    display: inline-block;
+    cursor: pointer;
+    color: #ffffff;
+    font-family: Arial;
+    font-size: 15px;
+    padding: 9px 23px;
+    text-decoration: none;
+  }
+
+  .butt:hover {
+    background-color: #4CB911;
+  }
+
+  .butt:active {
+    position: relative;
+    top: 1px;
+  }
+  .register {
+    text-decoration: none;
+  }
+  .mark {
+    position: absolute;
+  bottom: 8px;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  }
+        @media only screen and (max-width: 1000px) {
+            h3 {
+                font-size: 70px
+            }
+            input {
+                width: 400px;
+                height: 75px;
+            }
+            button {
+                height: 80px;
+                width:400;
+                font-size: 30px
+            }
+            a {
+                font-size: 30px
+            }
+            .logo {
+                  display: block;
+                  margin-left: auto;
+                  margin-right: auto;
+            
+            }
+            body {
+                width: 900px;
+                height: auto
+                    
+            }
+            
+}
+  
+
+    
+   </style>
+    
+    
+    
+    <body>
+    
+    <img src="images/logo.jpg" class="logo" height="75" width="auto">
+
+      <br>
+      <br>
+    <form style="text-align:center" id="reform">
+      <h3>Username:</h3>
+      <input name="user" class="user" type="username">
+      <br>
+      <br>
+      <br>
+      <h3>Password:</h3>
+      <input name="pass" class="pass" type="password">
+      <br>
+      <br>
+      <button class="butt">Login</button>
+      <br>
+      <br>
+      <a href="/register" class="register">Register</a>
+    </form>
+
+
+    <div class="mark">
+    <p>Toma Rodin 🐯</p>
+    </div>
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      $(document).ready(function(){
+              $('.butt').click(function(){
+                   $.post('/',$('#reform').serialize()).done(
+                     function(data){
+                      if(data.redirect) {
+                            window.location.href=data.url;
+                           }
+                      })
+              })
+          })
+      </script>
+
+
+
+    </body>
+</html>
+

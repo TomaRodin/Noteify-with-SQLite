@@ -1,0 +1,107 @@
+<html>
+    
+    <style>
+      h3, a, button, p {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .user, .pass, .confirmpass, .email  {
+            height:30px;
+            font-size:14pt;
+            border: none; /* <-- This thing here */
+            border:solid 1px #ccc;
+            border-radius: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .butt {
+    background-color: #5BC125;
+    border: none; /* <-- This thing here */
+    border-radius: 10px;
+    display: inline-block;
+    cursor: pointer;
+    color: #ffffff;
+    font-family: Arial;
+    font-size: 15px;
+    padding: 9px 23px;
+    text-decoration: none;
+  }
+
+  .butt:hover {
+    background-color: #4CB911;
+  }
+
+  .butt:active {
+    position: relative;
+    top: 1px;
+  }
+  .login {
+    text-decoration: none;
+  }
+  .mark {
+    position: absolute;
+  bottom: 8px;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  }
+    </style>
+    
+    
+    
+    <body>
+
+      <br>
+      <br>
+    <form style="text-align:center" id="reform">
+      <h3>Username:</h3>
+      <input name="newuser" class="user" type="username">
+      <br>
+      <br>
+      <h3>E-mail:</h3>
+      <input name="email" class="email" type="email">
+      <br>
+      <br>
+      <h3>Password:</h3>
+      <input name="newpass" class="pass" type="password">
+      <br>
+      <br>
+      <h3>Confirm Password:</h3>
+      <input class="confirmpass" type="password">
+      <br>
+      <br>
+      <button class="butt">Register</button>
+      <br>
+      <br>
+      <a href="/" class="login">Login</a>
+    </form>
+
+    <div class="mark">
+      <p>Toma Rodin 🐯</p>
+    </div>
+    
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      $(document).ready(function(){
+              $('.butt').click(function(){
+                var password = $( ".pass" ).val();
+                var confirmpass = $( ".confirmpass" ).val();
+                if ( password == confirmpass ){
+                   $.post('/register',$('#reform').serialize()).done(
+                     function(data){
+                      if(data.redirect) {
+                            window.location.href=data.url;
+                           }
+                      })
+                    } else {
+                      alert('Password and Confirm Password are diffrent')
+                    }
+              })
+          })
+      </script>
+
+
+
+    </body>
+</html>
