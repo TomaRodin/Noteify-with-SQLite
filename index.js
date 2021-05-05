@@ -44,6 +44,7 @@ app.post('/', function (req, res) {
             }
         }
     })
+
 })
 
 
@@ -121,28 +122,39 @@ app.get('/user/new', function (req, res) {
 
 
 app.post('/user/new', function (req, res) {
-    var array = JSON.parse(fs.readFileSync('./data.json', 'utf8'));
-    array.push({
-        "name": req.cookies.LoggedIn,
-        "title": req.body.title,
-        "text": req.body.text,
-        "id": uuidv4()
-    })
-    var jsonArray = JSON.stringify(array);
-    fs.writeFileSync('./data.json', jsonArray, { encoding: 'utf8', flag: 'w' });
+    const sqlite3 = require('sqlite3').verbose();
+    let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
+        if (err) {
+            console.error(err.message);
+        }
+        console.log('Connected to the database.');
+    });
+
+    db.run("INSERT INTO data (name,title,id,text ) VALUES ('"+ req.cookies.LoggedIn +"','"+req.body.title+"','"+uuidv4()+"','"+ req.body.text +"')");
+    db.each("SELECT * FROM data", function (err, row) {
+        console.log(row.name, row.title, row.id, row.text);
+    });
     res.send({ redirect: true, url: "/user" });
 })
 
 
 app.get('/user/notes/:id', function (req, res) {
-    var notes = JSON.parse(fs.readFileSync('./data.json', 'UTF-8'));
-    var user = notes.find(u => u.id === req.params.id);
-    if (user.name == req.cookies.LoggedIn) {
-        res.render(__dirname + '/public/view.ejs', { title: user.title, text: user.text, id:user.id })
-    }
-    else {
-        res.redirect('/user')
-    }
+    const sqlite3 = require('sqlite3').verbose();
+    let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
+        if (err) {
+            console.error(err.message);
+        }
+        console.log('Connected to the database.');
+    });
+        db.all("SELECT * FROM data WHERE id ="+"'"+req.params.id+"'",function (err,rows){
+            var row = rows[0];
+           if (row.name == req.cookies.LoggedIn ) {
+               res.render(__dirname + '/public/view.ejs', { title: row.title, text: row.text, id:row.id })
+           }
+           else {
+            res.redirect('/user')
+           }
+        })
 })
 
 app.post('/user/:id', function (req, res) {
@@ -224,7 +236,17 @@ app.get('/images', function (req, res) {
 })
 
 app.get('/data.json', function (req, res) {
-    res.sendFile(__dirname + '/data.json')
+    const sqlite3 = require('sqlite3').verbose();
+    let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
+        if (err) {
+            console.error(err.message);
+        }
+        console.log('Connected to the database.');
+    });
+        db.all("SELECT * FROM data WHERE name ="+"'"+req.cookies.LoggedIn+"'",function (err,rows){
+            console.log(rows)
+            res.json(rows)
+        })
 })
 
 app.get('user/images/undo.png', function (req, res) {
