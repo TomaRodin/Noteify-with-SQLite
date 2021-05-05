@@ -180,22 +180,13 @@ app.post('/user/:id', function (req, res) {
 })
 
 
-app.get('/user/:id/delete', function (req, res) {
-    var notes = JSON.parse(fs.readFileSync('./data.json', 'UTF-8'));
-    var note = notes.find(u => u.id === req.params.id);
-    if (note.name == req.cookies.LoggedIn) {
+app.post('/user/:id/delete', function (req, res) {
+    const sqlite3 = require('sqlite3').verbose();
+    let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
+    });
+    db.run("DELETE FROM data WHERE id = "+ "'"+req.params.id+ "'");
+    res.send({ redirect: true, url: "/user" });
 
-    var array = JSON.parse(fs.readFileSync('./data.json', 'UTF-8'));
-    console.log(array)
-    const filterArray = array.filter((item) => item.id !== req.params.id);
-    console.log('Deleted')
-    console.log(filterArray)
-    json = JSON.stringify(filterArray); //convert it back to json
-    fs.writeFileSync('./data.json', json, { encoding: 'utf8', flag: 'w' });
-    res.redirect('/user')
-}   else {
-    res.redirect('/')
-}
 })
 
 app.get('/user/settings',function(req, res){
@@ -215,20 +206,9 @@ app.post('/user/settings/delete',function(req, res){
         }
         console.log('Connected to the database.');
     });
-        db.all("SELECT * FROM users WHERE name ="+"'"+req.cookies.LoggedIn+"'",function (err,rows){
-            var row = rows[0];
-            console.log(row.id)
-            db.run("DELETE FROM users WHERE id = "+row.id);
-        })
+        db.run("DELETE FROM users WHERE name = "+ "'"+req.cookies.LoggedIn+ "'");
 
-
-    var arrayimage = JSON.parse(fs.readFileSync('./data.json', 'UTF-8'));
-    console.log(arrayimage)
-    const filterArraydata = arrayimage.filter((item) => item.name !== req.cookies.LoggedIn);
-    console.log('Deleted')
-    console.log(filterArraydata)
-    json = JSON.stringify(filterArraydata); //convert it back to json
-    fs.writeFileSync('./data.json', json, { encoding: 'utf8', flag: 'w' });
+        db.run("DELETE FROM data WHERE name = "+ "'"+req.cookies.LoggedIn+ "'");
     res.clearCookie('LoggedIn')
     req.method = 'get'; 
     res.redirect('/'); 

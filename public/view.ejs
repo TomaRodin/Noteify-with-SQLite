@@ -65,7 +65,7 @@ h3, a, p {
             <div class="button" id="button">Save</div>
             <br>
             <br>
-            <a href="/user/<%=id%>/delete"><img src="\images\trash.png" height="40" width="auto"></a>
+            <div class="del"><img src="\images\trash.png" height="40" width="auto"></div>
             <br>
             <br>
             <p>Undo</p>
@@ -90,9 +90,21 @@ h3, a, p {
                         })
                 })
             })
+
             function undo() {
               console.log("Ok")
               document.getElementById("text").value = "<%=text%>"
             }
+
+            $(document).ready(function(){
+                $('.del').click(function(){
+                     $.post('/user/<%=id%>/delete',$('#reform').serialize()).done(
+                       function(data){
+                        if(data.redirect) {
+                              window.location.href=data.url;
+                             }
+                        })
+                })
+            })
         </script>
 </html>
