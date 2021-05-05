@@ -158,18 +158,23 @@ app.get('/user/notes/:id', function (req, res) {
 })
 
 app.post('/user/:id', function (req, res) {
-    var myArray = JSON.parse(fs.readFileSync('./data.json', 'UTF-8'));
-    objIndex = myArray.findIndex((obj => obj.id == req.params.id));
+    console.log(req.params.id)
+    const sqlite3 = require('sqlite3').verbose();
+    let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
+        if (err) {
+            console.error(err.message);
+        }
+        console.log('Connected to the database.');
+    });
 
-    console.log(myArray)
-
-    myArray[objIndex].text = req.body.newtext
-
-    console.log(myArray)
-    
-    change = JSON.stringify(myArray);
-
-    fs.writeFileSync('./data.json', change, { encoding: 'utf8', flag: 'w' });
+    db.run('UPDATE data SET text = ? WHERE id = ?', [req.body.newtext,req.params.id],function(err) {
+        if (err) {
+            console.error(err.message);
+        }
+        else {
+            console.log('Updated')
+        }
+    })
 
     res.send({ redirect: true, url: "/" });
 })
