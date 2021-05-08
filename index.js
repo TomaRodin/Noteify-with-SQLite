@@ -72,12 +72,37 @@ app.post('/register', function (req, res) {
         if (row === undefined) {
             db.all("SELECT * FROM users WHERE pass ="+"'"+req.body.newpass+"'",function (err,rows){
                 console.log(rows)
+
                 var row = rows[0];
                 if (row == undefined) {
-                        db.run("INSERT INTO users (name,pass,mail ) VALUES ('"+ req.body.newuser +"','"+req.body.newpass+"','"+req.body.email+"')");
-                        db.each("SELECT * FROM users", function (err, row) {
-                            console.log(row.name, row.pass, row.id);
-                        });
+                        var uniqid = require('uniqid');
+                        var id = uniqid()
+                        db.run("INSERT INTO unverify (name,mail,pass,id ) VALUES ('"+ req.body.newuser +"','"+req.body.email+"','"+req.body.newpass+"','"+id+"')");
+                        var nodemailer = require('nodemailer')
+                            let transport = nodemailer.createTransport({
+                                host: 'smtp.gmail.com',
+                                port: 465,
+                                auth: {
+                                   user: 'vgta320@gmail.com',
+                                   pass: '///////////'
+                                }
+                            }); 
+                        
+                        
+                            const message = {
+                                from: 'vgta320@gmail.com', // Sender address
+                                to: req.body.email,         // List of recipients
+                                subject: 'Verify', // Subject line
+                                text: 'Link: '+ "http://localhost:3000/verify/"+id// Plain text body
+                            };
+                            transport.sendMail(message, function(err, info) {
+                                if (err) {
+                                  console.log(err)
+                                } else {
+                                  console.log(info);
+                                }
+                            });
+                    
                 } else {
                     return true
                 }
@@ -213,6 +238,34 @@ app.post('/user/settings/delete',function(req, res){
     req.method = 'get'; 
     res.redirect('/'); 
 })
+
+app.post('/user/settings/change_password',function(req, res){
+    console.log(req.body.newpass)
+})
+
+app.get('/verify/:id',function(req, res){
+    const sqlite3 = require('sqlite3').verbose();
+    let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
+        if (err) {
+            console.error(err.message);
+        }
+        console.log('Connected to the database.');
+    });
+    db.all("SELECT * FROM unverify WHERE id ="+"'"+req.params.id+"'",function (err,rows){
+        console.log(req.params.id)
+            var row = rows[0];
+            console.log(row)
+            if (row == undefined) {
+                res.redirect('/')
+            }
+            else {
+                db.run("INSERT INTO users (name,pass,mail ) VALUES ('"+ row.name+"','"+row.pass+"','"+row.mail+"')");
+                console.log('Verify successfully')
+                res.redirect('/')
+            }
+        })
+})
+
 
 
 

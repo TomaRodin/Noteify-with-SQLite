@@ -84,21 +84,25 @@
     display: flex;
     flex-direction: column-reverse;
   }
-  .myInput  {
-            height:30px;
-            font-size:14pt;
-            border: none; /* <-- This thing here */
-            border:solid 1px #ccc;
-            border-radius: 10px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .mark {
-    position: sticky;
-  bottom: 8px;
-  width: 100%;
-  text-align: center;
-  font-size: 18px;
+
+  .myInput {
+    height: 30px;
+    font-size: 14pt;
+    border: none;
+    /* <-- This thing here */
+    border: solid 1px #ccc;
+    border-radius: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
+
+  .mark {
+    position: sticky;
+    bottom: 8px;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+  }
+
   .settings {
     position: absolute;
   }
@@ -112,8 +116,9 @@
   <div class="border"></div>
   <br>
 
-  <a href="/user/settings" style="float: right; margin-right: 50px;" ><img src="/images/settings.png" height="50px" width="auto" class="settings"></a>
-  
+  <a href="/user/settings" style="float: right; margin-right: 50px;"><img src="/images/settings.png" height="50px"
+      width="auto" class="settings"></a>
+
   <a href="/user/new" class="note">New Note</a>
   <input class="myInput" id="myInput" placeholder="MyNote...">
   <br>
@@ -122,13 +127,13 @@
 
 
 
-  
+
 
 </body>
 
-  <div class="mark">
-    <p>Toma Rodin 🐯</p>
-  </div>
+<div class="mark">
+  <p>Toma Rodin 🐯</p>
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
@@ -137,13 +142,10 @@
 
     $.getJSON("/data.json", function (data) {
 
-      const searchKey = "<%=name%>"
-
-      const searchResult = data.filter(({ name }) => name.toLowerCase() === searchKey.toLowerCase());
 
 
       const parentWrapper = document.querySelector('.wrapper');
-      searchResult.forEach((el) => {
+      data.forEach((el) => {
         const div = document.createElement('div');
         div.style.backgroundColor = '#F1F3F4';
         div.style.borderRadius = '10px';
@@ -151,7 +153,7 @@
         child.textContent = el.title;
         div.appendChild(child);
         const time = document.createElement('p')
-        time.textContent = el.date 
+        time.textContent = el.date
         time.style = "display:inline-block;"
         const link = document.createElement('p')
         link.textContent = el.text
@@ -160,21 +162,21 @@
         parentWrapper.appendChild(space)
         const edit = document.createElement('a')
         edit.textContent = "Edit"
-        edit.href = "/user/notes/"+ el.id
+        edit.href = "/user/notes/" + el.id
         div.appendChild(edit)
         parentWrapper.append(div);
       });
 
     });
   }
-    $(document).ready(function(){
-  $("#myInput").on("keyup", function() {
-    var value = $(this).val().toLowerCase();
-    $("#wrapper div").filter(function() {
-      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+  $(document).ready(function () {
+    $("#myInput").on("keyup", function () {
+      var value = $(this).val().toLowerCase();
+      $("#wrapper div").filter(function () {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
     });
   });
-});
 </script>
 
 

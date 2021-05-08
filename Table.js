@@ -7,7 +7,7 @@ let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
 });
 db.serialize(function () {
     //db.run("DROP TABLE users")
-    db.run("CREATE TABLE data ( name INTEGER PRIMARY KEY AUTOINCREMENT, title text NOT NULL, id text NOT NULL, text text NOT NULL);");
+    db.run("CREATE TABLE unverify ( name INTEGER PRIMARY KEY AUTOINCREMENT, title name NOT NULL, pass text NOT NULL, id text NOT NULL);");
 });
 db.close((err) => {
     if (err) {

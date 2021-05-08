@@ -47,6 +47,27 @@
 	position:relative;
 	top:1px;
 }
+
+#change {
+  border:1px solid;
+	background-color: #ffffff;
+	border-radius:20px;
+	display:inline-block;
+	cursor:pointer;
+	color:black;
+	font-family:Arial;
+	font-size:13px;
+	padding:13px 10px;
+	text-decoration:none;
+}
+#change:hover {
+	background-color:#d4d1d1;
+}
+#change:active {
+	position:relative;
+	top:1px;
+}
+
     </style>
     <body>
         <a href="/user"><img src="/images/logo.jpg" height="75" width="auto"></a>
@@ -60,6 +81,11 @@
 
             <div class="delete">
             <p class="element1">Delete Account</p><a class="element2" id="deletebutton">Delete</a>
+            <br>
+            <p class="element1">Change Password</p><a onclick="showpass()" class="element2" id="change">Change</a>
+            <form id="form">
+          
+            </form>
             </div>
 
         </div>
@@ -72,6 +98,22 @@
                     $.post( "/user/settings/delete" );
                       
                   })
+
+                  function showpass() {
+                    document.getElementById('form').innerHTML = "<input placeholder=\"Enter new password:\" name=\"newpass\">" + "<button class=\"button\">Sumbit</button>"
+                    
+                  }
+
+                  $(document).ready(function(){
+                $('.button').click(function(){
+                     $.post('/user/settings/change_password',$('#form').serialize()).done(
+                       function(data){
+                        if(data.redirect) {
+                              window.location.href=data.url;
+                             }
+                        })
+                })
+            })
               
     </script>
 
