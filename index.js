@@ -80,8 +80,8 @@ app.post('/register', function (req, res) {
                         db.run("INSERT INTO unverify (name,mail,pass,id ) VALUES ('"+ req.body.newuser +"','"+req.body.email+"','"+req.body.newpass+"','"+id+"')");
                         var nodemailer = require('nodemailer')
                             let transport = nodemailer.createTransport({
-                                host: 'smtp.gmail.com',
-                                port: 465,
+                                host: ///////,
+                                port: //////
                                 auth: {
                                    user: 'vgta320@gmail.com',
                                    pass: '///////////'
