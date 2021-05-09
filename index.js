@@ -92,17 +92,22 @@ app.post('/register', function (req, res) {
                         db.run("INSERT INTO unverify (name,mail,pass,id ) VALUES ('"+ req.body.newuser +"','"+req.body.email+"','"+req.body.newpass+"','"+id+"')");
                         var nodemailer = require('nodemailer')
                             let transport = nodemailer.createTransport({
-                                host: //host,
-                                port: //port,
+
+                                host: ""//host,
+                                port: ""//port,
+
+                                host: ""///////,
+                                port: ""//////
+
                                 auth: {
-                                   user: //host,
-                                   pass: //pass'
+                                   user: ""//host,
+                                   pass: ""//pass'
                                 }
                             }); 
                         
                         
                             const message = {
-                                from: //sender, // Sender address
+                                from: ""//sender, // Sender address
                                 to: req.body.email,         // List of recipients
                                 subject: 'Verify', // Subject line
                                 text: 'Link: '+ "http://localhost:3000/verify/"+id// Plain text body
