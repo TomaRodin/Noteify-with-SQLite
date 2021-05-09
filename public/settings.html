@@ -82,8 +82,8 @@
             <div class="delete">
             <p class="element1">Delete Account</p><a class="element2" id="deletebutton">Delete</a>
             <br>
-            <p class="element1">Change Password</p><a onclick="showpass()" class="element2" id="change">Change</a>
-            <form id="form">
+            <p class="element1">Change Password</p><a href="/user/settings/change_password" class="element2" id="change">Change</a>
+            <form id="reform">
           
             </form>
             </div>
@@ -94,27 +94,14 @@
     <script>
                   
                   $('#deletebutton').click(function(){
-                    window.location.replace("/");
-                    $.post( "/user/settings/delete" );
+                    $.post( "/delete/settings/delete" );
                       
                   })
+                     
 
-                  function showpass() {
-                    document.getElementById('form').innerHTML = "<input placeholder=\"Enter new password:\" name=\"newpass\">" + "<button class=\"button\">Sumbit</button>"
-                    
-                  }
+     
 
-                  $(document).ready(function(){
-                $('.button').click(function(){
-                     $.post('/user/settings/change_password',$('#form').serialize()).done(
-                       function(data){
-                        if(data.redirect) {
-                              window.location.href=data.url;
-                             }
-                        })
-                })
-            })
-              
+
     </script>
 
 

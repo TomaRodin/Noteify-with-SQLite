@@ -5,7 +5,15 @@ const { v4: uuidv4 } = require('uuid');
 var ejs = require('ejs');
 var fs = require('fs');
 var app = express();
-
+var selectdb = require(__dirname + '/JS/selectdb.js')
+var SelectById = require(__dirname + '/JS/SelectById.js')
+var InsertNote = require(__dirname + '/JS/InsertNote.js')
+var UpdateNote = require(__dirname + '/JS/UpdateNote.js')
+var DeleteNote = require(__dirname + '/JS/DeleteNote.js')
+var DeleteUser = require(__dirname + '/JS/DeleteUser.js')
+var SelectUserById = require(__dirname + '/JS/SelectUserById.js')
+var InsertUser = require(__dirname + '/JS/InsertUser.js')
+var DeleteUserUnverify = require(__dirname + '/JS/DeleteUserUnverify.js')
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -21,29 +29,33 @@ app.get('/', function (req, res) {
     }
 })
 
-app.post('/', function (req, res) {
-    const sqlite3 = require('sqlite3').verbose();
-    let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
-    });
-
-    db.all("SELECT * FROM users WHERE name ="+"'"+req.body.user+"'",function (err,rows){
-        var row = rows[0];
-        console.log(row)
-        if ( row === undefined) {
+app.post('/login', function (req, res) {
+    selectdb.getUser(req.body.user, function(user){
+        
+        console.log(user)
+        if ( user === undefined) {
             console.log('Does not exist')
         }
         else {
-            if (row.pass === req.body.pass) {
+            if (user.pass === req.body.pass) {
+                res.cookie('LoggedIn',user.name)
+                res.method = 'GET'
+                res.redirect('/user')
                 console.log("Logged In")
-                res.cookie('LoggedIn',row.name)
-                res.send({ redirect: true, url: "/user" })
+                
+              
             }
-            else {
+            else if (user.pass !== req.body.pass) {
                 console.log('Wrong Password')
                 res.send({ redirect: true, url: "/" })
             }
         }
+    
     })
+
+    
+      
+    
 
 })
 
@@ -80,17 +92,17 @@ app.post('/register', function (req, res) {
                         db.run("INSERT INTO unverify (name,mail,pass,id ) VALUES ('"+ req.body.newuser +"','"+req.body.email+"','"+req.body.newpass+"','"+id+"')");
                         var nodemailer = require('nodemailer')
                             let transport = nodemailer.createTransport({
-                                host: 'smtp.gmail.com',
-                                port: 465,
+                                host: //host,
+                                port: //port,
                                 auth: {
-                                   user: 'vgta320@gmail.com',
-                                   pass: '///////////'
+                                   user: //host,
+                                   pass: //pass'
                                 }
                             }); 
                         
                         
                             const message = {
-                                from: 'vgta320@gmail.com', // Sender address
+                                from: //sender, // Sender address
                                 to: req.body.email,         // List of recipients
                                 subject: 'Verify', // Subject line
                                 text: 'Link: '+ "http://localhost:3000/verify/"+id// Plain text body
@@ -147,54 +159,36 @@ app.get('/user/new', function (req, res) {
 
 
 app.post('/user/new', function (req, res) {
-    const sqlite3 = require('sqlite3').verbose();
-    let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
-        if (err) {
-            console.error(err.message);
-        }
-        console.log('Connected to the database.');
-    });
+    var id = uuidv4();
+    var name = req.cookies.LoggedIn
+    var title = req.body.title
+    var text = req.body.text
 
-    db.run("INSERT INTO data (name,title,id,text ) VALUES ('"+ req.cookies.LoggedIn +"','"+req.body.title+"','"+uuidv4()+"','"+ req.body.text +"')");
-    db.each("SELECT * FROM data", function (err, row) {
-        console.log(row.name, row.title, row.id, row.text);
-    });
+    InsertNote.insert(name,title,id,text)
+
     res.send({ redirect: true, url: "/user" });
 })
 
 
 app.get('/user/notes/:id', function (req, res) {
-    const sqlite3 = require('sqlite3').verbose();
-    let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
-        if (err) {
-            console.error(err.message);
-        }
-        console.log('Connected to the database.');
-    });
-        db.all("SELECT * FROM data WHERE id ="+"'"+req.params.id+"'",function (err,rows){
-            var row = rows[0];
-           if (row.name == req.cookies.LoggedIn ) {
-               res.render(__dirname + '/public/view.ejs', { title: row.title, text: row.text, id:row.id })
+    SelectById.getNote(req.params.id, function(note){
+           if (note.name == req.cookies.LoggedIn ) {
+               res.render(__dirname + '/public/view.ejs', { title: note.title, text: note.text, id:note.id })
            }
            else {
             res.redirect('/user')
            }
         })
+       
 })
 
 app.post('/user/:id', function (req, res) {
-    console.log(req.params.id)
-    const sqlite3 = require('sqlite3').verbose();
-    let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
-        if (err) {
-            console.error(err.message);
-        }
-        console.log('Connected to the database.');
-    });
+    var newtext = req.body.newtext
+    var id = req.params.id
 
-    db.run('UPDATE data SET text = ? WHERE id = ?', [req.body.newtext,req.params.id],function(err) {
+    UpdateNote.update(newtext,id,function (err){
         if (err) {
-            console.error(err.message);
+            console.error(err)
         }
         else {
             console.log('Updated')
@@ -202,14 +196,16 @@ app.post('/user/:id', function (req, res) {
     })
 
     res.send({ redirect: true, url: "/" });
+
+    
 })
 
 
 app.post('/user/:id/delete', function (req, res) {
-    const sqlite3 = require('sqlite3').verbose();
-    let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
-    });
-    db.run("DELETE FROM data WHERE id = "+ "'"+req.params.id+ "'");
+    var id = req.params.id
+
+    DeleteNote.delete(id)
+
     res.send({ redirect: true, url: "/user" });
 
 })
@@ -223,27 +219,57 @@ app.get('/user/settings',function(req, res){
     }
 })
 
-app.post('/user/settings/delete',function(req, res){
-    const sqlite3 = require('sqlite3').verbose();
-    let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
-        if (err) {
-            console.error(err.message);
-        }
-        console.log('Connected to the database.');
-    });
-        db.run("DELETE FROM users WHERE name = "+ "'"+req.cookies.LoggedIn+ "'");
+app.post('/delete/settings/delete',function(req, res){
+    var user = req.body.user
 
-        db.run("DELETE FROM data WHERE name = "+ "'"+req.cookies.LoggedIn+ "'");
+    DeleteUser.delete(user)
+
+    console.log('User deleted')
+
     res.clearCookie('LoggedIn')
     req.method = 'get'; 
     res.redirect('/'); 
 })
 
+app.get('/user/settings/change_password',function(req, res){
+    if (req.cookies.LoggedIn == undefined) {
+        res.redirect('/');
+    }
+    else {
+        res.sendFile(__dirname+'/public/changepassword.html')
+    }
+})
+
+
+
+
 app.post('/user/settings/change_password',function(req, res){
-    console.log(req.body.newpass)
+    
 })
 
 app.get('/verify/:id',function(req, res){
+    var id = req.params.id
+
+    SelectUserById.selectUnverify(id,function(user){
+
+            
+            console.log(user)
+            if (user == undefined) {
+                res.redirect('/')
+            }
+            else {
+                InsertUser.insert(user.name, user.pass, user.mail)
+
+                DeleteUserUnverify.delete(user.name)
+                
+                console.log('Verify successfully')
+                res.redirect('/')
+            }
+        })
+})
+
+
+app.post('/change_password',function (req, res){
     const sqlite3 = require('sqlite3').verbose();
     let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
         if (err) {
@@ -251,20 +277,17 @@ app.get('/verify/:id',function(req, res){
         }
         console.log('Connected to the database.');
     });
-    db.all("SELECT * FROM unverify WHERE id ="+"'"+req.params.id+"'",function (err,rows){
-        console.log(req.params.id)
-            var row = rows[0];
-            console.log(row)
-            if (row == undefined) {
-                res.redirect('/')
-            }
-            else {
-                db.run("INSERT INTO users (name,pass,mail ) VALUES ('"+ row.name+"','"+row.pass+"','"+row.mail+"')");
-                console.log('Verify successfully')
-                res.redirect('/')
-            }
-        })
+
+    db.run('UPDATE users SET pass = ? WHERE name = ?', [req.body.newpass,req.cookies.LoggedIn],function(err) {
+        if (err) {
+            console.error(err.message);
+        }
+        else {
+            console.log('Successfully changed passwords');
+        }
+    })
 })
+
 
 
 

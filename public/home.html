@@ -137,7 +137,7 @@
     <script>
       $(document).ready(function(){
               $('.butt').click(function(){
-                   $.post('/',$('#reform').serialize()).done(
+                   $.post('/login',$('#reform').serialize()).done(
                      function(data){
                       if(data.redirect) {
                             window.location.href=data.url;
