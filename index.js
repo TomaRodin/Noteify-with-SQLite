@@ -14,6 +14,7 @@ var DeleteUser = require(__dirname + '/JS/DeleteUser.js')
 var SelectUserById = require(__dirname + '/JS/SelectUserById.js')
 var InsertUser = require(__dirname + '/JS/InsertUser.js')
 var DeleteUserUnverify = require(__dirname + '/JS/DeleteUserUnverify.js')
+var UpdatePassword = require(__dirname + '/JS/UpdatePassword.js')
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -92,22 +93,17 @@ app.post('/register', function (req, res) {
                         db.run("INSERT INTO unverify (name,mail,pass,id ) VALUES ('"+ req.body.newuser +"','"+req.body.email+"','"+req.body.newpass+"','"+id+"')");
                         var nodemailer = require('nodemailer')
                             let transport = nodemailer.createTransport({
-
-                                host: ""//host,
-                                port: ""//port,
-
-                                host: ""///////,
-                                port: ""//////
-
+                                host: '///',
+                                port: ///,
                                 auth: {
-                                   user: ""//host,
-                                   pass: ""//pass'
+                                   user: '///',
+                                   pass: '///'
                                 }
                             }); 
                         
                         
                             const message = {
-                                from: ""//sender, // Sender address
+                                from: '', // Sender address
                                 to: req.body.email,         // List of recipients
                                 subject: 'Verify', // Subject line
                                 text: 'Link: '+ "http://localhost:3000/verify/"+id// Plain text body
@@ -249,7 +245,17 @@ app.get('/user/settings/change_password',function(req, res){
 
 
 app.post('/user/settings/change_password',function(req, res){
-    
+    var password = req.body.newpass
+    var name = req.cookies.LoggedIn
+
+    UpdatePassword.update(password,name)
+
+    console.log('Updated')
+    res.clearCookie('LoggedIn')
+    res.send({redirect: true, url: '/'});
+
+
+
 })
 
 app.get('/verify/:id',function(req, res){
