@@ -39,10 +39,9 @@ app.post('/login', function (req, res) {
         }
         else {
             if (user.pass === req.body.pass) {
-                res.cookie('LoggedIn',user.name)
-                res.method = 'GET'
-                res.redirect('/user')
                 console.log("Logged In")
+                res.cookie('LoggedIn',user.name)
+                res.send({redirect: true, url: '/user'});
                 
               
             }
@@ -93,17 +92,17 @@ app.post('/register', function (req, res) {
                         db.run("INSERT INTO unverify (name,mail,pass,id ) VALUES ('"+ req.body.newuser +"','"+req.body.email+"','"+req.body.newpass+"','"+id+"')");
                         var nodemailer = require('nodemailer')
                             let transport = nodemailer.createTransport({
-                                host: '///',
+                                host: '////',
                                 port: ///,
                                 auth: {
-                                   user: '///',
-                                   pass: '///'
+                                   user: '////',
+                                   pass: '////'
                                 }
                             }); 
                         
                         
                             const message = {
-                                from: '', // Sender address
+                                from: '////', // Sender address
                                 to: req.body.email,         // List of recipients
                                 subject: 'Verify', // Subject line
                                 text: 'Link: '+ "http://localhost:3000/verify/"+id// Plain text body
