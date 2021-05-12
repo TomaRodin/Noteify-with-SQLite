@@ -15,6 +15,7 @@ var SelectUserById = require(__dirname + '/JS/SelectUserById.js')
 var InsertUser = require(__dirname + '/JS/InsertUser.js')
 var DeleteUserUnverify = require(__dirname + '/JS/DeleteUserUnverify.js')
 var UpdatePassword = require(__dirname + '/JS/UpdatePassword.js')
+var VerifyUser = require(__dirname + '/JS/VerifyUser.js')
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -34,11 +35,17 @@ app.post('/login', function (req, res) {
     selectdb.getUser(req.body.user, function(user){
         
         console.log(user)
-        if ( user === undefined) {
+        if ( user === undefined ) {
             console.log('Does not exist')
         }
+
+        
         else {
-            if (user.pass === req.body.pass) {
+            
+            if (user.active == "false") {
+                console.log('Unverify')
+            }
+            else if (user.pass === req.body.pass) {
                 console.log("Logged In")
                 res.cookie('LoggedIn',user.name)
                 res.send({redirect: true, url: '/user'});
@@ -89,11 +96,11 @@ app.post('/register', function (req, res) {
                 if (row == undefined) {
                         var uniqid = require('uniqid');
                         var id = uniqid()
-                        db.run("INSERT INTO unverify (name,mail,pass,id ) VALUES ('"+ req.body.newuser +"','"+req.body.email+"','"+req.body.newpass+"','"+id+"')");
+                        db.run("INSERT INTO users (name,mail,pass,active_id,active ) VALUES ('"+ req.body.newuser +"','"+req.body.email+"','"+req.body.newpass+"','"+id+"','"+"false"+"')");
                         var nodemailer = require('nodemailer')
                             let transport = nodemailer.createTransport({
                                 host: '////',
-                                port: ///,
+                                port: ////,
                                 auth: {
                                    user: '////',
                                    pass: '////'
@@ -259,44 +266,12 @@ app.post('/user/settings/change_password',function(req, res){
 
 app.get('/verify/:id',function(req, res){
     var id = req.params.id
+    VerifyUser.verify(id)
+    console.log('Verified')
+    res.redirect('/')
 
-    SelectUserById.selectUnverify(id,function(user){
-
-            
-            console.log(user)
-            if (user == undefined) {
-                res.redirect('/')
-            }
-            else {
-                InsertUser.insert(user.name, user.pass, user.mail)
-
-                DeleteUserUnverify.delete(user.name)
-                
-                console.log('Verify successfully')
-                res.redirect('/')
-            }
-        })
-})
-
-
-app.post('/change_password',function (req, res){
-    const sqlite3 = require('sqlite3').verbose();
-    let db = new sqlite3.Database('users', sqlite3.OPEN_READWRITE, (err) => {
-        if (err) {
-            console.error(err.message);
-        }
-        console.log('Connected to the database.');
-    });
-
-    db.run('UPDATE users SET pass = ? WHERE name = ?', [req.body.newpass,req.cookies.LoggedIn],function(err) {
-        if (err) {
-            console.error(err.message);
-        }
-        else {
-            console.log('Successfully changed passwords');
-        }
     })
-})
+
 
 
 
