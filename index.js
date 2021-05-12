@@ -16,6 +16,7 @@ var InsertUser = require(__dirname + '/JS/InsertUser.js')
 var DeleteUserUnverify = require(__dirname + '/JS/DeleteUserUnverify.js')
 var UpdatePassword = require(__dirname + '/JS/UpdatePassword.js')
 var VerifyUser = require(__dirname + '/JS/VerifyUser.js')
+var SelectByActiveId = require(__dirname + '/JS/SelectByActiveId.js')
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -266,9 +267,22 @@ app.post('/user/settings/change_password',function(req, res){
 
 app.get('/verify/:id',function(req, res){
     var id = req.params.id
-    VerifyUser.verify(id)
-    console.log('Verified')
-    res.redirect('/')
+    SelectByActiveId.select(id,function(user){
+        console.log(user)
+        if (user == undefined) {
+            res.send('404 Not Found')
+        }
+        else if (user.active == "true") {
+            res.send('Already Verified')
+        }
+        else {
+            VerifyUser.verify(id)
+            console.log('Verified')
+            res.redirect('/')
+        }
+
+    })
+
 
     })
 
