@@ -110,7 +110,7 @@
 
       <br>
       <br>
-    <form style="text-align:center" id="reform">
+    <form action="/" method="POST" style="text-align:center" id="reform">
       <h3>Username:</h3>
       <input name="user" class="user" type="username">
       <br>
@@ -132,21 +132,6 @@
     </div>
 
 
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-      $(document).ready(function(){
-              $('.butt').click(function(){
-                   $.post('/login',$('#reform').serialize()).done(
-                     function(data){
-                      if(data.redirect) {
-                            window.location.href=data.url;
-                           }
-                      })
-              })
-              
-          })
-      </script>
 
 
 
